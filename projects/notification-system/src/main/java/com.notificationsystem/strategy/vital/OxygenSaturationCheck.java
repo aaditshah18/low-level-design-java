@@ -4,7 +4,7 @@ import com.notificationsystem.enums.SeverityLevel;
 import com.notificationsystem.enums.VitalType;
 import com.notificationsystem.model.VitalSignReading;
 
-public class OxygenSaturation implements VitalCheckStrategy {
+public class OxygenSaturationCheck implements VitalCheckStrategy {
 
     @Override
     public SeverityLevel evaluate(VitalSignReading reading) {
