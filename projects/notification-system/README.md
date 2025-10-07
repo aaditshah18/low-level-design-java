@@ -110,8 +110,6 @@ classDiagram
     Observer <|.. Doctor
     Observer <|.. Nurse
 ```
-![Notification System UML](NotificationSystemUML.png)
-
 ## Design Principles and Patterns
 
 This project adheres to the following SOLID principles and employs several design patterns:
