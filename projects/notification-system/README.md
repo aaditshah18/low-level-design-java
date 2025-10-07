@@ -12,6 +12,105 @@ The system is built around the following core concepts:
 *   **User Roles:** The system defines different user roles (Doctor, Nurse) with different responsibilities.
 *   **Extensibility:** The system is designed to be easily extensible with new vital sign checks, notification channels, and user roles.
 
+## UML Diagram
+
+```mermaid
+classDiagram
+    class User {
+        -String id
+        -String name
+        -Role role
+    }
+
+    class Doctor {
+        +User user
+    }
+
+    class Nurse {
+        +User user
+    }
+
+    class Patient {
+        -String id
+        -String name
+    }
+
+    class VitalSignMonitor {
+        -VitalCheckStrategy strategy
+        +evaluate(VitalSignReading)
+    }
+
+    interface VitalCheckStrategy {
+        +evaluate(VitalSignReading)
+    }
+
+    class HeartRateCheck {
+        +evaluate(VitalSignReading)
+    }
+
+    class TemperatureCheck {
+        +evaluate(VitalSignReading)
+    }
+    
+    class BloodPressureCheck {
+        +evaluate(VitalSignReading)
+    }
+    
+    class OxygenSaturationCheck {
+        +evaluate(VitalSignReading)
+    }
+
+    class NotificationService {
+        -List~NotificationChannel~ channels
+        +sendNotification(Notification, User)
+    }
+
+    interface NotificationChannel {
+        +sendNotification(Notification, User)
+    }
+
+    class SMSChannel {
+        +sendNotification(Notification, User)
+    }
+
+    class EmailChannel {
+        +sendNotification(Notification, User)
+    }
+    
+    class PushChannel {
+        +sendNotification(Notification, User)
+    }
+
+    class PatientMonitorSubject {
+        -List~Observer~ observers
+        +registerObserver(Observer)
+        +removeObserver(Observer)
+        +notifyObservers(Notification)
+    }
+
+    interface Observer {
+        +update(Notification)
+    }
+
+    User <|-- Doctor
+    User <|-- Nurse
+    
+    VitalSignMonitor o-- VitalCheckStrategy
+    VitalCheckStrategy <|.. HeartRateCheck
+    VitalCheckStrategy <|.. TemperatureCheck
+    VitalCheckStrategy <|.. BloodPressureCheck
+    VitalCheckStrategy <|.. OxygenSaturationCheck
+
+    NotificationService o-- NotificationChannel
+    NotificationChannel <|.. SMSChannel
+    NotificationChannel <|.. EmailChannel
+    NotificationChannel <|.. PushChannel
+
+    PatientMonitorSubject o-- Observer
+    Observer <|.. Doctor
+    Observer <|.. Nurse
+```
+
 ## Design Principles and Patterns
 
 This project adheres to the following SOLID principles and employs several design patterns:
@@ -29,11 +128,11 @@ This project adheres to the following SOLID principles and employs several desig
 *   **Strategy Pattern:** Used to define a family of algorithms (vital sign checks) and make them interchangeable. The `VitalCheckStrategy` interface and its implementations (`HeartRateCheck`, `BloodPressureCheck`, etc.) are a good example.
 *   **Factory Pattern:** Used to create objects without exposing the creation logic to the client. The `NotificationChannelFactory`, `NotificationFactory`, and `VitalCheckStrategyFactory` classes are examples of this pattern.
 *   **Observer Pattern:** Used to establish a one-to-many dependency between objects. The `PatientMonitorSubject` (the subject) notifies all its registered `Observer`s (the observers) when a patient's vital signs are abnormal.
-*   **Singleton Pattern:** While not explicitly used with a classic singleton implementation, the `VitalCheckStrategyFactory` provides a single point of access to the vital check strategies, behaving like a singleton.
+*   **Static Factory Pattern:** The `VitalCheckStrategyFactory` uses static initialization to provide a single shared map of strategies. This avoids redundant object creation and offers global access without requiring an instance. 
 
 ## Project Structure
 
-The project is organized into the following packages:
+This modular layout ensures clean separation of concerns and makes the system easier to navigate and extend. The project is organized into the following packages:
 
 *   `demo`: Contains a demonstration of the notification system.
 *   `enums`: Contains enumerations for `Role`, `SeverityLevel`, and `VitalType`.
@@ -49,7 +148,7 @@ The project is organized into the following packages:
 
 ### Prerequisites
 
-*   Java Development Kit (JDK) 8 or higher
+*   Java Development Kit (JDK) 24 or higher
 *   Apache Maven
 
 ### Building the Project
