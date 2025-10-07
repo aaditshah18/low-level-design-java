@@ -40,7 +40,7 @@ classDiagram
         +evaluate(VitalSignReading)
     }
 
-    interface VitalCheckStrategy {
+    class VitalCheckStrategy {
         +evaluate(VitalSignReading)
     }
 
@@ -61,11 +61,11 @@ classDiagram
     }
 
     class NotificationService {
-        -List~NotificationChannel~ channels
+        -channels : List of NotificationChannel
         +sendNotification(Notification, User)
     }
 
-    interface NotificationChannel {
+    class NotificationChannel {
         +sendNotification(Notification, User)
     }
 
@@ -82,13 +82,13 @@ classDiagram
     }
 
     class PatientMonitorSubject {
-        -List~Observer~ observers
+        -observers : List of Observer
         +registerObserver(Observer)
         +removeObserver(Observer)
         +notifyObservers(Notification)
     }
 
-    interface Observer {
+    class Observer {
         +update(Notification)
     }
 
@@ -110,6 +110,7 @@ classDiagram
     Observer <|.. Doctor
     Observer <|.. Nurse
 ```
+![Notification System UML](NotificationSystemUML.png)
 
 ## Design Principles and Patterns
 
