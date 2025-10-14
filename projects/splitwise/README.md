@@ -1,67 +1,107 @@
-# Splitwise Expense Sharing Application
+# 💸 Splitwise - Expense Sharing Application
 
-## Overview
+This project is a command-line simulation of an expense-sharing application like Splitwise. It provides a clear, simplified model for managing users, groups, and shared expenses. It's an excellent case study for applying object-oriented design principles and patterns to solve a real-world logic puzzle.
 
-This project is a simplified command-line version of a Splitwise-like expense sharing application. It allows users to be created, grouped, and to add expenses with different split types (Equal, Exact, and Percentage). The application then calculates and displays the balances owed between users. This project serves as a practical example of applying core object-oriented design principles and design patterns in Java.
+---
 
-## Core Concepts
+## ✨ Core Concepts
 
-The application is built around a few core concepts that work together to model the expense sharing process:
+The application is built around a few core concepts that model the expense sharing process:
 
-*   **User:** Represents an individual who can participate in expenses. Each user has a unique ID, name, email, and mobile number.
-
-*   **Group:** A collection of users who share expenses. A group has a name and a list of members. All expenses are recorded within a group.
-
-*   **Expense:** This is the central entity in the system, representing a single financial transaction. An expense has an amount, the user who paid it, a description, and a list of splits that determine how the cost is divided. `Expense` is an abstract class, with concrete implementations for different ways of splitting the cost:
+*   👤 **User:** An individual who can participate in expenses. Each user has a unique ID and contact information.
+*   👥 **Group:** A collection of users who share expenses. All expenses are recorded within a group context.
+*   💰 **Expense:** The central entity representing a single transaction. It defines who paid, how much, and how the cost is split. This is an abstract concept with three concrete splitting methods:
     *   `EqualExpense`: The cost is divided equally among all participants.
     *   `ExactExpense`: Each participant pays a specific, pre-defined amount.
-    *   `PercentExpense`: Each participant pays a certain percentage of the total amount.
+    *   `PercentExpense`: Each participant pays a certain percentage of the total.
+*   📊 **Split:** Represents a single user's share of an expense. This is also an abstract class with concrete types (`EqualSplit`, `ExactSplit`, `PercentSplit`) that correspond to the expense type.
+*   🕹️ **ExpenseManager:** The main controller of the system. It manages users, groups, and the final balance sheet, providing the core logic for adding expenses and calculating who owes whom.
 
-*   **Split:** This abstract class represents how a single user's share of an expense is calculated. There are concrete subclasses that correspond to the different expense types:
-    *   `EqualSplit`: For `EqualExpense`.
-    *   `ExactSplit`: For `ExactExpense`, storing the exact amount owed.
-    *   `PercentSplit`: For `PercentExpense`, storing the percentage owed.
+---
 
-*   **ExpenseManager:** This class acts as the main controller of the system. It manages users, groups, and the balance sheet. It provides the main logic for adding expenses and calculating the final balances between users.
+## 🎨 Design & Architecture
 
-## Design Patterns Used
+<details>
+<summary>Click to view UML Diagram</summary>
 
-This project demonstrates the use of several important design patterns that help to make the code more flexible, extensible, and maintainable.
+```mermaid
+classDiagram
+    class ExpenseManager {
+        +addUser(User)
+        +addGroup(Group)
+        +addExpense(ExpenseType, ...)
+        +showBalances()
+    }
 
-### Factory Pattern
+    class User
+    class Group {
+        -List~User~ members
+    }
 
-The **Factory Pattern** is used to create objects without exposing the creation logic to the client. In this project, the `ExpenseFactory` class is a clear example of this pattern.
+    class ExpenseFactory {
+        +createExpense(ExpenseType, ...): Expense
+    }
 
-*   **How it's used:** The `ExpenseManager` doesn't create `Expense` objects directly. Instead, it delegates this responsibility to the `ExpenseFactory`. Based on the `ExpenseType` enum (`EQUAL`, `EXACT`, or `PERCENTAGE`), the factory method `createExpense` returns the appropriate concrete `Expense` object (`EqualExpense`, `ExactExpense`, or `PercentExpense`).
+    class Expense {
+        <<abstract>>
+        -double amount
+        -User paidBy
+        -List~Split~ splits
+        +validate()
+    }
 
-*   **Benefits:** This decouples the `ExpenseManager` from the concrete `Expense` classes. If we want to add a new expense type in the future (e.g., `ShareExpense`), we would only need to create a new `ShareExpense` class and update the `ExpenseFactory`. The `ExpenseManager` would not need to be changed, adhering to the Open/Closed Principle.
+    class EqualExpense
+    class ExactExpense
+    class PercentExpense
 
-## SOLID Principles
+    class Split {
+        <<abstract>>
+        -User user
+        -double amount
+    }
+    class EqualSplit
+    class ExactSplit
+    class PercentSplit
 
-The design of this application adheres to the SOLID principles of object-oriented design, which make the system more robust and easier to maintain.
+    ExpenseManager ..> User
+    ExpenseManager ..> Group
+    ExpenseManager ..> ExpenseFactory
+    ExpenseFactory ..> Expense
+    
+    Group o-- User
+    Expense o-- Split
+    
+    Expense <|-- EqualExpense
+    Expense <|-- ExactExpense
+    Expense <|-- PercentExpense
 
-### Single Responsibility Principle (SRP)
+    Split <|-- EqualSplit
+    Split <|-- ExactSplit
+    Split <|-- PercentSplit
+```
 
-Each class in the project has a single, well-defined responsibility.
+</details>
 
-*   `User`, `Group`, `Expense`, and `Split` classes are all model classes that only hold data and have no other responsibilities.
-*   `ExpenseManager` is responsible for managing the high-level operations of the application.
-*   `ExpenseFactory` is solely responsible for creating `Expense` objects.
-*   `IdGenerator` has the single purpose of generating unique IDs.
+### SOLID Principles
 
-### Open/Closed Principle (OCP)
+The design adheres to the SOLID principles to create a system that is robust and easy to maintain.
 
-The system is designed to be **open for extension, but closed for modification.**
+| Principle                               | Description                                                                                                                                                                                                                          |
+| --------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| 🎯 **Single Responsibility (SRP)**      | Each class has a single purpose. `User` and `Group` are data models. `ExpenseFactory` only creates expenses. `ExpenseManager` orchestrates the main operations.                                                                     |
+| 🔌 **Open/Closed (OCP)**                | The system is **open for extension, but closed for modification**. We can add a new expense type (e.g., `ByShareExpense`) by creating new `Expense` and `Split` subclasses and updating the `ExpenseFactory`, without touching `ExpenseManager`. |
+| ↔️ **Liskov Substitution (LSP)**         | Subtypes can replace their base types. The `ExpenseManager` works with the abstract `Expense` class and can handle `EqualExpense`, `ExactExpense`, etc., polymorphically without knowing the specific type. Each expense type correctly implements its own `validate()` method. |
 
-*   This is most evident in the handling of expense types. If a new expense type is needed, we can create a new subclass of `Expense` and a corresponding `Split` class, and then update the `ExpenseFactory`. We do not need to modify the existing `ExpenseManager` or other core components of the system.
+### Design Patterns
 
-### Liskov Substitution Principle (LSP)
+| Pattern                               | Usage                                                                                                                                                                                                                                                                                        |
+| ------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 🏭 **Factory Pattern**                | Used to create objects without exposing the creation logic. The `ExpenseManager` delegates the creation of `Expense` objects to an `ExpenseFactory`. This decouples the manager from concrete expense classes, upholding the Open/Closed Principle.                                                |
+| 🚗 **Strategy Pattern**               | The various expense types (`EqualExpense`, `ExactExpense`, `PercentExpense`) act as **strategies** for splitting a cost. The `ExpenseManager` and `ExpenseFactory` work together to select the appropriate strategy at runtime based on user input, without the client needing to know the implementation details of how each split is calculated or validated. |
 
-The different types of expenses (`EqualExpense`, `ExactExpense`, `PercentExpense`) are all subtypes of the `Expense` abstract class. They can be used interchangeably wherever an `Expense` object is expected.
+---
 
-*   For example, the `ExpenseManager`'s `addExpense` method works with an `Expense` object. Thanks to polymorphism, it can handle any of the concrete expense types without needing to know the specific type. Each expense type has its own `validate()` method, which is called polymorphically.
-
-## Setup and Usage
+## 🛠️ Setup and Usage
 
 This project is built using Apache Maven. You can build and run it from the command line.
 
@@ -70,21 +110,24 @@ This project is built using Apache Maven. You can build and run it from the comm
 *   Java Development Kit (JDK) 8 or higher
 *   Apache Maven
 
-### Building the Project
+### Build and Run
 
-1.  Navigate to the `projects/splitwise` directory.
-2.  Run the following Maven command to build the project:
+1.  **Navigate to the project directory**:
+
+    ```sh
+    cd projects/splitwise
+    ```
+
+2.  **Build the project** using Maven:
 
     ```sh
     mvn clean install
     ```
 
-### Running the Application
+3.  **Run the application** to see the demo:
 
-Once the project is built, you can run the application using the following command from the `projects/splitwise` directory:
+    ```sh
+    mvn exec:java -Dexec.mainClass="com.splitwise.Main"
+    ```
 
-```sh
-mvn exec:java -Dexec.mainClass="com.splitwise.Main"
-```
-
-This will execute the `demo()` method in the `Demo` class, which showcases the application's functionality by creating users, adding various types of expenses, and printing the final balances.
+    This will execute the demo, which creates users, adds various types of expenses, and prints the final balances, showcasing the application's functionality.
