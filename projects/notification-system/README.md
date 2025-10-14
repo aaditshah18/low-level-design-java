@@ -1,18 +1,25 @@
-# Patient Monitoring and Notification System
+# 🏥 Patient Monitoring & Notification System
 
-This project is a Java-based patient monitoring system that demonstrates key software design principles and patterns. It's designed to monitor patients' vital signs, detect anomalies, and send notifications to healthcare professionals through various channels.
+This project is a Java-based patient monitoring system designed to demonstrate key software design principles and patterns. It simulates a real-world healthcare scenario where patient vital signs are continuously monitored, anomalies are detected, and notifications are instantly sent to healthcare professionals through various channels.
 
-## Core Concepts
+---
 
-The system is built around the following core concepts:
+## ✨ Core Concepts
 
-*   **Patient Monitoring:** The system continuously monitors vital signs of patients, such as heart rate, blood pressure, oxygen saturation, and temperature.
-*   **Anomaly Detection:** It uses a set of rules to detect abnormal vital sign readings.
-*   **Notification System:** When an anomaly is detected, the system sends notifications to relevant healthcare staff (doctors, nurses) through multiple channels like SMS, Email, and Push notifications.
-*   **User Roles:** The system defines different user roles (Doctor, Nurse) with different responsibilities.
-*   **Extensibility:** The system is designed to be easily extensible with new vital sign checks, notification channels, and user roles.
+The system is built around the following core ideas:
 
-## UML Diagram
+*   🩺 **Patient Monitoring:** Continuously tracks patients' vital signs, including heart rate, blood pressure, oxygen saturation, and temperature.
+*   🔬 **Anomaly Detection:** Uses a flexible set of rules to identify and flag abnormal vital sign readings that require attention.
+*   🚀 **Notification System:** When an anomaly is detected, the system dispatches alerts to the relevant healthcare staff (doctors, nurses) through multiple channels like SMS, Email, and Push Notifications.
+*   👥 **User Roles:** Defines distinct user roles (`Doctor`, `Nurse`) with different responsibilities and notification preferences.
+*   🧩 **Extensibility:** Architected to be easily extended with new vital sign checks, notification channels, and user roles without altering existing code.
+
+---
+
+## 🎨 Design & Architecture
+
+<details>
+<summary>Click to view UML Diagram</summary>
 
 ```mermaid
 classDiagram
@@ -61,7 +68,7 @@ classDiagram
     }
 
     class NotificationService {
-        -channels : List of NotificationChannel
+        -channels : List~NotificationChannel~
         +sendNotification(Notification, User)
     }
 
@@ -82,7 +89,7 @@ classDiagram
     }
 
     class PatientMonitorSubject {
-        -observers : List of Observer
+        -observers : List~Observer~
         +registerObserver(Observer)
         +removeObserver(Observer)
         +notifyObservers(Notification)
@@ -110,83 +117,89 @@ classDiagram
     Observer <|.. Doctor
     Observer <|.. Nurse
 ```
-## Design Principles and Patterns
 
-This project adheres to the following SOLID principles and employs several design patterns:
+</details>
 
 ### SOLID Principles
 
-*   **Single Responsibility Principle (SRP):** Each class has a single, well-defined responsibility. For example, the `VitalSignMonitor` is responsible for checking vital signs, while the `NotificationService` is responsible for sending notifications.
-*   **Open/Closed Principle (OCP):** The system is open for extension but closed for modification. You can add new vital sign checks or notification channels without modifying the existing code, thanks to the Strategy and Factory patterns.
-*   **Liskov Substitution Principle (LSP):** Subtypes are substitutable for their base types. For example, `Doctor` and `Nurse` are subtypes of `User` and can be used wherever a `User` is expected.
-*   **Interface Segregation Principle (ISP):** The project uses several small, focused interfaces (e.g., `NotificationChannel`, `VitalCheckStrategy`, `Observer`) rather than large, monolithic ones.
-*   **Dependency Inversion Principle (DIP):** High-level modules do not depend on low-level modules; both depend on abstractions. For example, `VitalSignMonitor` depends on the `VitalCheckStrategy` interface, not on concrete implementations like `HeartRateCheck`.
+This project adheres to the SOLID principles to ensure a robust and maintainable codebase.
+
+| Principle                               | Description                                                                                                                                                                                          |
+| --------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 🎯 **Single Responsibility (SRP)**      | Each class has one job. `VitalSignMonitor` checks vitals, `NotificationService` sends alerts, and models like `User` just hold data.                                                                  |
+| 🔌 **Open/Closed (OCP)**                | The system is **open for extension, but closed for modification**. New vital checks or notification channels can be added via strategy and factory patterns without changing the core logic.           |
+| ↔️ **Liskov Substitution (LSP)**         | Subtypes can replace their base types without errors. A `Doctor` or `Nurse` can be used anywhere a `User` is expected.                                                                                |
+| 🍴 **Interface Segregation (ISP)**      | We use small, focused interfaces (`NotificationChannel`, `VitalCheckStrategy`, `Observer`) instead of large, general-purpose ones.                                                                   |
+| 🔄 **Dependency Inversion (DIP)**       | High-level modules depend on abstractions, not on low-level details. `VitalSignMonitor` depends on the `VitalCheckStrategy` interface, not a concrete `HeartRateCheck`.                               |
 
 ### Design Patterns
 
-*   **Strategy Pattern:** Used to define a family of algorithms (vital sign checks) and make them interchangeable. The `VitalCheckStrategy` interface and its implementations (`HeartRateCheck`, `BloodPressureCheck`, etc.) are a good example.
-*   **Factory Pattern:** Used to create objects without exposing the creation logic to the client. The `NotificationChannelFactory`, `NotificationFactory`, and `VitalCheckStrategyFactory` classes are examples of this pattern.
-*   **Observer Pattern:** Used to establish a one-to-many dependency between objects. The `PatientMonitorSubject` (the subject) notifies all its registered `Observer`s (the observers) when a patient's vital signs are abnormal.
-*   **Static Factory Pattern:** The `VitalCheckStrategyFactory` uses static initialization to provide a single shared map of strategies. This avoids redundant object creation and offers global access without requiring an instance. 
+Several design patterns are employed to solve common architectural challenges elegantly.
 
-## Project Structure
+| Pattern                               | Usage                                                                                                                                                                                                |
+| ------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 🚗 **Strategy Pattern**               | Defines a family of algorithms (vital sign checks) and makes them interchangeable. This allows the checking logic for `HeartRateCheck` vs. `BloodPressureCheck` to be swapped at runtime.             |
+| 🏭 **Factory Pattern**                | Creates objects without exposing the complex creation logic. `NotificationChannelFactory` and `VitalCheckStrategyFactory` abstract away the instantiation of different channels and check strategies. |
+| 👀 **Observer Pattern**                | Establishes a one-to-many dependency. The `PatientMonitorSubject` (the subject) notifies all registered `Observer`s (e.g., doctors, nurses) when a patient's vital signs become abnormal.          |
+| 🏭 **Static Factory**                 | The `VitalCheckStrategyFactory` uses a static block to pre-load strategies into a map. This ensures strategies are singletons, improving performance and memory efficiency.                           |
 
-This modular layout ensures clean separation of concerns and makes the system easier to navigate and extend. The project is organized into the following packages:
+---
 
-*   `demo`: Contains a demonstration of the notification system.
-*   `enums`: Contains enumerations for `Role`, `SeverityLevel`, and `VitalType`.
-*   `exceptions`: Contains custom exception classes.
-*   `factory`: Contains factory classes for creating objects.
-*   `manager`: Contains the `NotificationService` for managing notifications.
-*   `model`: Contains the data models for the system (e.g., `User`, `Patient`, `Notification`).
-*   `observer`: Contains the classes for the Observer design pattern.
-*   `strategy`: Contains the classes for the Strategy design pattern, organized into `channel` and `vital` sub-packages.
-*   `util`: Contains utility classes like `AuditLogger` and `IdGenerator`.
+## 📂 Project Structure
 
-## Setup and Usage
+The project is organized into packages to ensure a clean separation of concerns, making the system easier to navigate and extend.
+
+-   `demo`: Contains a runnable demonstration of the system.
+-   `enums`: Holds enumerations for `Role`, `SeverityLevel`, and `VitalType`.
+-   `exceptions`: Contains custom exception classes for error handling.
+-   `factory`: Home to factory classes for creating objects dynamically.
+-   `manager`: Contains the core `NotificationService` for managing notifications.
+-   `model`: Contains the data models (e.g., `User`, `Patient`, `Notification`).
+-   `observer`: Contains the classes implementing the Observer design pattern.
+-   `strategy`: Contains the Strategy pattern classes, organized into `channel` and `vital` sub-packages.
+-   `util`: Contains utility classes like `AuditLogger` and `IdGenerator`.
+
+---
+
+## 🛠️ Setup and Usage
 
 ### Prerequisites
 
-*   Java Development Kit (JDK) 24 or higher
+*   Java Development Kit (JDK) 11 or higher
 *   Apache Maven
 
-### Building the Project
+### Build and Run
 
-1.  Clone the repository:
+1.  **Clone the repository** and navigate to the project directory:
     ```bash
-    git clone https://github.com/your-username/notification-system.git
+    cd projects/notification-system
     ```
-2.  Navigate to the project directory:
-    ```bash
-    cd notification-system
-    ```
-3.  Build the project using Maven:
+
+2.  **Build the project** using Maven:
     ```bash
     mvn clean install
     ```
 
-### Running the Demo
+3.  **Run the demo** to see the system in action:
+    ```bash
+    mvn exec:java -Dexec.mainClass="com.notificationsystem.Main"
+    ```
+    This will simulate monitoring a patient's vital signs and sending notifications to a doctor and a nurse.
 
-To run the demo application, execute the following command:
+---
 
-```bash
-mvn exec:java -Dexec.mainClass="com.notificationsystem.Main"
-```
-
-This will run the `NotificationDemo` which simulates a scenario where a patient's vital signs are monitored, and notifications are sent to a doctor and a nurse.
-
-## How to Extend the System
+## 🧩 How to Extend the System
 
 ### Adding a New Vital Sign Check
 
-1.  Create a new class that implements the `VitalCheckStrategy` interface.
-2.  Implement the `evaluate` method with the logic for the new vital sign check.
-3.  Add the new vital sign to the `VitalType` enum.
-4.  Update the `VitalCheckStrategyFactory` to include the new strategy.
+1.  **Create a Strategy:** Create a new class that implements the `VitalCheckStrategy` interface.
+2.  **Implement Logic:** Add the evaluation logic in the `evaluate` method.
+3.  **Register Type:** Add the new vital sign to the `VitalType` enum.
+4.  **Update Factory:** Register the new strategy in the `VitalCheckStrategyFactory`.
 
 ### Adding a New Notification Channel
 
-1.  Create a new class that implements the `NotificationChannel` interface.
-2.  Implement the `sendNotification` method with the logic for the new channel.
-3.  Update the `NotificationChannelFactory` to include the new channel.
-4.  Register the new channel with the `NotificationService` in the demo or your application logic.
+1.  **Create a Channel:** Create a new class that implements the `NotificationChannel` interface.
+2.  **Implement Logic:** Add the sending logic in the `sendNotification` method.
+3.  **Update Factory:** Register the new channel in the `NotificationChannelFactory`.
+4.  **Register Channel:** Add the new channel to the `NotificationService` in the demo.
